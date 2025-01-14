@@ -1,24 +1,50 @@
 import { View, Text, Image, ScrollView, TouchableOpacity, Alert, TextInput } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import images from '@/constants/images'
 import icons from '@/constants/icons'
-import { login } from '@/lib/appwrite'
-import { account } from '@/AppwriteService'
+import { useUser } from '@/contexts/userContext'
+import { useRouter } from 'expo-router'
+import { toast } from '@/lib/toast'
+import LoadingSpinner from './components/loadingSpinner'
 
 
 const Signin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
+  const user = useUser();
+
+  useEffect(() => {
+    if (user.current) {
+      router.replace("/"); // Use `replace` to prevent navigating back to the Signin page
+    }
+  }, [user.current]);
+
     const handleLogin = async ()=>{
       try {
-        const result = await account.createEmailPasswordSession(email, password);
-        Alert.alert("Success", "Logged in!");
-        console.log(result);
+        setIsLoading(true)
+        await user.login(email, password)
+
       } catch (error) {
-        Alert.alert("Error", "Invalid Credential");
+        toast('Error')
+      } finally{
+        setIsLoading(false)
       }
+      
     }
+
+    const handleLoginWithGoogle = ()=> {
+      
+    }
+  
+
+      // Prevent rendering the Signin page if the user is logged in
+      if (isLoading) {
+        return <LoadingSpinner />;
+      }
 
   return (
     <SafeAreaView className="bg-white h-full">
@@ -64,7 +90,7 @@ const Signin = () => {
                       </View>
                       
                   </TouchableOpacity>
-                   <TouchableOpacity onPress={handleLogin} className="bg-white shadow-md shadow-zinc-300 rounded-full w-full py-4 px-3 mt-5">
+                   <TouchableOpacity onPress={handleLoginWithGoogle} className="bg-white shadow-md shadow-zinc-300 rounded-full w-full py-4 px-3 mt-5">
                       <View className='flex flex-row items-center justify-center gap-3'>
                           <Image source={icons.google} className='w-5 h-5' resizeMode='contain'/>
                           <Text className='text-lg font-rubik'>Continue with Google</Text>
