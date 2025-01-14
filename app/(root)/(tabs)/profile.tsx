@@ -90,7 +90,9 @@ const Profile = () => {
 
         <View className='flex flex-col mt-5 border-t pt-5 border-slate-200'>
           {user.current? <SettingItem title="Logout" icon={icons.logout} textStyle='text-danger' showArrow={false} onPress={handleLogout}/> :
-          <SettingItem title="Signin" icon={icons.logout} textStyle='text-primary-200' />
+          <SettingItem title="Sign-In" icon={icons.logout} textStyle='text-primary-200' onPress={()=>{
+            router.push('/signin')
+          }} />
           }
           
         </View>
